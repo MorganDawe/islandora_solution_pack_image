@@ -128,6 +128,9 @@ function islandora_basic_image_create_thumbnail(AbstractObject $object, $force =
       else {
         $return = islandora_basic_image_failed_scaling();
       }
+      if (isset($tn_file)) {
+        file_delete($tn_file);
+      }
     }
     if (isset($original_file)) {
       file_delete($original_file['file']);
@@ -180,6 +183,9 @@ function islandora_basic_image_create_medium_size(AbstractObject $object, $force
       else {
         $return = islandora_basic_image_failed_scaling();
       }
+      if (isset($medium_file)) {
+        file_delete($medium_file);
+      }
     }
     if (isset($original_file)) {
       file_delete($original_file['file']);
@@ -215,6 +221,7 @@ function islandora_basic_image_copy_obj_datastream(AbstractObject $object) {
   $file->status = 0;
   $object['OBJ']->getContent($file_uri);
   $original_file = file_save($file);
+  file_delete($file);
   return array(
     'file' => $original_file,
     'extension' => $ext,
