@@ -221,7 +221,6 @@ function islandora_basic_image_copy_obj_datastream(AbstractObject $object) {
   $file->status = 0;
   $object['OBJ']->getContent($file_uri);
   $original_file = file_save($file);
-  file_delete($file);
   return array(
     'file' => $original_file,
     'extension' => $ext,
