@@ -100,6 +100,7 @@ function islandora_basic_image_add_datastream(AbstractObject $object, $dsid, $fi
  */
 function islandora_basic_image_create_thumbnail(AbstractObject $object, $force = FALSE) {
   $return = '';
+  module_load_include('inc', 'islandora', 'includes/utilities');
   if (!isset($object['TN']) || (isset($object['TN']) && $force === TRUE)) {
     $original_file = islandora_basic_image_copy_obj_datastream($object);
     if ($original_file === FALSE) {
