@@ -58,6 +58,7 @@ function islandora_basic_image_scale_image($file, $width, $height) {
  *   otherwise.
  */
 function islandora_basic_image_add_datastream(AbstractObject $object, $dsid, $file) {
+  module_load_include('inc', 'islandora', 'includes/utilities');
   try {
     $ingest = !isset($object[$dsid]);
     if ($ingest) {
@@ -72,7 +73,8 @@ function islandora_basic_image_add_datastream(AbstractObject $object, $dsid, $fi
     if ($ingest) {
       $object->ingestDatastream($ds);
     }
-    file_delete($file);
+    $file_name = str_replace(':', '-', $object->id);
+    islandora_temp_file_entry($file_name, drupal_realpath($file->uri));
     return TRUE;
   }
   catch (exception $e) {
