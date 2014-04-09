@@ -73,8 +73,8 @@ function islandora_basic_image_add_datastream(AbstractObject $object, $dsid, $fi
     if ($ingest) {
       $object->ingestDatastream($ds);
     }
-//     $file_name = str_replace(':', '-', $object->id);
-//     islandora_temp_file_entry($file_name, drupal_realpath($file->uri));
+    $file_name = str_replace(':', '-', $object->id);
+    islandora_temp_file_entry($file_name, drupal_realpath($file->uri));
     return TRUE;
   }
   catch (exception $e) {
@@ -130,9 +130,9 @@ function islandora_basic_image_create_thumbnail(AbstractObject $object, $force =
       else {
         $return = islandora_basic_image_failed_scaling();
       }
-//       if (isset($tn_file)) {
-//         file_delete($tn_file);
-//       }
+      if (isset($tn_file)) {
+        file_delete($tn_file);
+      }
     }
     if (isset($original_file)) {
       file_delete($original_file['file']);
@@ -185,9 +185,9 @@ function islandora_basic_image_create_medium_size(AbstractObject $object, $force
       else {
         $return = islandora_basic_image_failed_scaling();
       }
-//       if (isset($medium_file)) {
-//         file_delete($medium_file);
-//       }
+      if (isset($medium_file)) {
+        file_delete($medium_file);
+      }
     }
     if (isset($original_file)) {
       file_delete($original_file['file']);
