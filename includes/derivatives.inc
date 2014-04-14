@@ -78,7 +78,7 @@ function islandora_basic_image_add_datastream(AbstractObject $object, $dsid, $fi
       $object->ingestDatastream($ds);
     }
     // Clean up our temp file.
-    islandora_temp_file_delete($file_name, $file->uri);
+    islandora_temp_file_delete($file->uri);
     return TRUE;
   }
   catch (exception $e) {
@@ -107,7 +107,6 @@ function islandora_basic_image_add_datastream(AbstractObject $object, $dsid, $fi
 function islandora_basic_image_create_thumbnail(AbstractObject $object, $force = FALSE) {
   module_load_include('inc', 'islandora', 'includes/utilities');
   $return = '';
-  $temp_file_arr = array();
   if (!isset($object['TN']) || (isset($object['TN']) && $force === TRUE)) {
     $original_file = islandora_basic_image_copy_obj_datastream($object);
 
@@ -118,17 +117,12 @@ function islandora_basic_image_create_thumbnail(AbstractObject $object, $force =
       // Manage the file.
       $file_name = drupal_basename($original_file['file']->uri);
       islandora_temp_file_entry($file_name, $original_file['file']->uri);
-      $temp_file_arr[] = $original_file['file']->uri;
 
       $tn_file = file_copy($original_file['file'], 'temporary://' . $original_file['filename'] . 'TN.' . $original_file['extension']);
 
-      $tn_file_name = drupal_basename($tn_file->uri);
-      islandora_temp_file_entry($tn_file_name, $tn_file->uri);
-      $temp_file_arr[] = $tn_file->uri;
-
       if (islandora_basic_image_scale_image($tn_file, 200, 200)) {
         $added_successfully = islandora_basic_image_add_datastream($object, 'TN', $tn_file);
-        islandora_temp_file_delete_multi($temp_file_arr);
+        islandora_temp_file_delete($original_file['file']->uri);
         if ($added_successfully !== TRUE) {
           $return = islandora_basic_image_failed_adding($added_successfully);
         }
