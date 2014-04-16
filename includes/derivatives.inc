@@ -61,8 +61,7 @@ function islandora_basic_image_add_datastream(AbstractObject $object, $dsid, $fi
   module_load_include('inc', 'islandora', 'includes/utilities');
   try {
     // Manage our temp file.
-    $file_name = drupal_basename($file->uri);
-    islandora_temp_file_entry($file_name, $file->uri);
+    islandora_temp_file_entry($file->uri);
 
     $ingest = !isset($object[$dsid]);
     if ($ingest) {
@@ -109,17 +108,13 @@ function islandora_basic_image_create_thumbnail(AbstractObject $object, $force =
   $return = '';
   if (!isset($object['TN']) || (isset($object['TN']) && $force === TRUE)) {
     $original_file = islandora_basic_image_copy_obj_datastream($object);
-
+    // Manage the file.
+    islandora_temp_file_entry($original_file['file']->uri);
     if ($original_file === FALSE) {
       return islandora_basic_image_no_obj_datastream($object->id);
     }
     else {
-      // Manage the file.
-      $file_name = drupal_basename($original_file['file']->uri);
-      islandora_temp_file_entry($file_name, $original_file['file']->uri);
-
       $tn_file = file_copy($original_file['file'], 'temporary://' . $original_file['filename'] . 'TN.' . $original_file['extension']);
-
       if (islandora_basic_image_scale_image($tn_file, 200, 200)) {
         $added_successfully = islandora_basic_image_add_datastream($object, 'TN', $tn_file);
         islandora_temp_file_delete($original_file['file']->uri);
@@ -170,6 +165,7 @@ function islandora_basic_image_create_medium_size(AbstractObject $object, $force
     }
     else {
       $medium_file = file_copy($original_file['file'], 'temporary://' . $original_file['filename'] . 'TN.' . $original_file['extension']);
+      islandora_temp_file_delete($medium_file);
       if (islandora_basic_image_scale_image($medium_file, 500, 700)) {
         $added_successfully = islandora_basic_image_add_datastream($object, 'MEDIUM_SIZE', $medium_file);
         if ($added_successfully !== TRUE) {
