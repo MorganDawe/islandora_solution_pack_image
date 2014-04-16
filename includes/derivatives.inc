@@ -165,7 +165,6 @@ function islandora_basic_image_create_medium_size(AbstractObject $object, $force
     }
     else {
       $medium_file = file_copy($original_file['file'], 'temporary://' . $original_file['filename'] . 'TN.' . $original_file['extension']);
-      islandora_temp_file_delete($medium_file);
       if (islandora_basic_image_scale_image($medium_file, 500, 700)) {
         $added_successfully = islandora_basic_image_add_datastream($object, 'MEDIUM_SIZE', $medium_file);
         if ($added_successfully !== TRUE) {
