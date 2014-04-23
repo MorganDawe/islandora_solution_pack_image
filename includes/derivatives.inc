@@ -58,7 +58,6 @@ function islandora_basic_image_scale_image($file, $width, $height) {
  *   otherwise.
  */
 function islandora_basic_image_add_datastream(AbstractObject $object, $dsid, $file) {
-  module_load_include('inc', 'islandora', 'includes/utilities');
   try {
     $ingest = !isset($object[$dsid]);
     if ($ingest) {
@@ -81,7 +80,6 @@ function islandora_basic_image_add_datastream(AbstractObject $object, $dsid, $fi
     );
     watchdog('islandora_basic_image', 'Basic image failed to add data stream.<br/>Error: @ret', $variables, WATCHDOG_ERROR);
     $message = $e->getMessage();
-    //islandora_temp_file_delete($file->uri);
     return $message;
   }
 }
@@ -100,7 +98,6 @@ function islandora_basic_image_add_datastream(AbstractObject $object, $dsid, $fi
  * @see hook_islandora_derivative()
  */
 function islandora_basic_image_create_thumbnail(AbstractObject $object, $force = FALSE) {
-  module_load_include('inc', 'islandora', 'includes/utilities');
   $return = '';
   if (!isset($object['TN']) || (isset($object['TN']) && $force === TRUE)) {
     $original_file = islandora_basic_image_copy_obj_datastream($object);
@@ -109,10 +106,9 @@ function islandora_basic_image_create_thumbnail(AbstractObject $object, $force =
     }
     else {
       $tn_file = file_copy($original_file['file'], 'temporary://' . $original_file['filename'] . 'TN.' . $original_file['extension']);
-      islandora_temp_file_entry($tn_file->uri);
       if (islandora_basic_image_scale_image($tn_file, 200, 200)) {
         $added_successfully = islandora_basic_image_add_datastream($object, 'TN', $tn_file);
-        islandora_temp_file_delete($tn_file->uri);
+        file_delete($tn_file);
         if ($added_successfully !== TRUE) {
           $return = islandora_basic_image_failed_adding($added_successfully);
         }
@@ -131,6 +127,9 @@ function islandora_basic_image_create_thumbnail(AbstractObject $object, $force =
       }
       else {
         $return = islandora_basic_image_failed_scaling();
+      }
+      if($tn_file) {
+        file_delete($tn_file);
       }
     }
     return $return;
@@ -152,7 +151,6 @@ function islandora_basic_image_create_thumbnail(AbstractObject $object, $force =
  * @see hook_islandora_derivative()
  */
 function islandora_basic_image_create_medium_size(AbstractObject $object, $force = FALSE) {
-  module_load_include('inc', 'islandora', 'includes/utilities');
   $return = '';
   if (!isset($object['MEDIUM_SIZE']) || (isset($object['MEDIUM_SIZE']) && $force === TRUE)) {
     $original_file = islandora_basic_image_copy_obj_datastream($object);
@@ -161,9 +159,9 @@ function islandora_basic_image_create_medium_size(AbstractObject $object, $force
     }
     else {
       $medium_file = file_copy($original_file['file'], 'temporary://' . $original_file['filename'] . 'TN.' . $original_file['extension']);
-      islandora_temp_file_entry($medium_file->uri);
       if (islandora_basic_image_scale_image($medium_file, 500, 700)) {
         $added_successfully = islandora_basic_image_add_datastream($object, 'MEDIUM_SIZE', $medium_file);
+        file_delete($medium_file);
         if ($added_successfully !== TRUE) {
           $return = islandora_basic_image_failed_adding($added_successfully);
         }
@@ -183,8 +181,8 @@ function islandora_basic_image_create_medium_size(AbstractObject $object, $force
       else {
         $return = islandora_basic_image_failed_scaling();
       }
-      if (isset($medium_file)) {
-        islandora_temp_file_delete($medium_file->uri);
+      if ($medium_file) {
+        file_delete($medium_file);
       }
     }
     return $return;
