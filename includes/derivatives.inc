@@ -128,8 +128,11 @@ function islandora_basic_image_create_thumbnail(AbstractObject $object, $force =
       else {
         $return = islandora_basic_image_failed_scaling();
       }
-      if($tn_file) {
+      if (isset($tn_file)) {
         file_delete($tn_file);
+      }
+      if (isset($original_file)) {
+        file_delete($original_file['file']);
       }
     }
     return $return;
@@ -183,6 +186,9 @@ function islandora_basic_image_create_medium_size(AbstractObject $object, $force
       }
       if ($medium_file) {
         file_delete($medium_file);
+      }
+      if (isset($original_file)) {
+        file_delete($original_file['file']);
       }
     }
     return $return;
